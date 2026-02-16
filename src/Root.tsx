@@ -1,44 +1,60 @@
-import { Composition } from "remotion";
-import { HelloWorld, myCompSchema } from "./HelloWorld";
-import { Logo, myCompSchema2 } from "./HelloWorld/Logo";
+// src/Root.tsx
+// ============================================================
+// C'est le "sommaire" de toutes vos compositions vidéo
+// Remotion regarde ce fichier pour savoir quelles vidéos
+// vous pouvez créer
+// ============================================================
 
-// Each <Composition> is an entry in the sidebar!
+import React from "react";
+import { Composition } from "remotion";
+import {
+  MeditationVideo,
+  defaultMeditationProps,
+} from "./compositions/MeditationVideo";
+import { MeditationInputProps } from "./types";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* ── COMPOSITION PRINCIPALE : Méditation 10 minutes ── */}
       <Composition
-        // You can take the "id" to render a video:
-        // npx remotion render HelloWorld
-        id="HelloWorld"
-        component={HelloWorld}
-        durationInFrames={150}
-        fps={30}
+        // Identifiant unique — c'est ce nom que Modal/n8n utilisera
+        id="MeditationVideo"
+        // Le composant React qui génère la vidéo
+        component={MeditationVideo}
+        // Dimensions : Full HD (1920×1080)
         width={1920}
         height={1080}
-        // You can override these props for each render:
-        // https://www.remotion.dev/docs/parametrized-rendering
-        schema={myCompSchema}
-        defaultProps={{
-          titleText: "Welcome to Remotion",
-          titleColor: "#000000",
-          logoColor1: "#91EAE4",
-          logoColor2: "#86A8E7",
+        // 30 images par seconde (standard pour des vidéos calmes)
+        fps={30}
+        // Durée : 10 minutes = 600 secondes × 30 fps = 18 000 frames
+        durationInFrames={18000}
+        // Props par défaut pour la prévisualisation dans le Studio
+        defaultProps={defaultMeditationProps}
+        // Schéma de validation des props (optionnel mais recommandé)
+        // Permet à Remotion de vérifier que les données envoyées
+        // par n8n sont correctes
+        calculateMetadata={({ props }) => {
+          return {
+            // On peut ajuster la durée dynamiquement si besoin
+            durationInFrames: 18000,
+            props,
+          };
         }}
       />
 
-      {/* Mount any React component to make it show up in the sidebar and work on it individually! */}
+      {/* ── COMPOSITION COURTE : Aperçu de 30 secondes ────── */}
+      {/* Utile pour les tests rapides et la prévisualisation */}
       <Composition
-        id="OnlyLogo"
-        component={Logo}
-        durationInFrames={150}
-        fps={30}
+        id="MeditationPreview"
+        component={MeditationVideo}
         width={1920}
         height={1080}
-        schema={myCompSchema2}
+        fps={30}
+        durationInFrames={900} // 30 secondes seulement
         defaultProps={{
-          logoColor1: "#91dAE2" as const,
-          logoColor2: "#86A8E7" as const,
+          ...defaultMeditationProps,
+          titre: "Aperçu — Méditation du Matin",
         }}
       />
     </>
