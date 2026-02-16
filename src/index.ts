@@ -1,7 +1,7 @@
-// This is your entry file! Refer to it when you render:
-// npx remotion render <entry-file> HelloWorld out/video.mp4
+// src/index.ts
+// ============================================================
+// Ce fichier exporte simplement le Root
+// C'est le point d'entrée que Remotion cherche
+// ============================================================
 
-import { registerRoot } from "remotion";
-import { RemotionRoot } from "./Root";
-
-registerRoot(RemotionRoot);
+export { RemotionRoot } from "./Root";
