@@ -1,26 +1,13 @@
-// src/components/IntroScene.tsx
-// ============================================================
-// Écran titre avec le nom de la méditation
-// Apparaît en douceur pendant les premières secondes
-// ============================================================
-
 import React from "react";
-import {
-  useCurrentFrame,
-  interpolate,
-  spring,
-  useVideoConfig,
-} from "remotion";
+import { useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 
-interface IntroSceneProps {
+export const IntroScene: React.FC<{
   titre: string;
   sousTitre?: string;
   instructeur?: string;
   couleurPrincipale?: string;
   couleurSecondaire?: string;
-}
-
-export const IntroScene: React.FC<IntroSceneProps> = ({
+}> = ({
   titre,
   sousTitre,
   instructeur,
@@ -30,23 +17,20 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Animation du titre avec spring doux
-  const titreAnimation = spring({
-    frame: frame - 30, // Commence après 1 seconde
+  const titreAnim = spring({
+    frame: frame - 30,
     fps,
     config: { damping: 200, stiffness: 60, mass: 2 },
   });
 
-  // Animation du sous-titre (apparaît après le titre)
-  const sousTitreAnimation = spring({
-    frame: frame - 60, // Commence après 2 secondes
+  const sousTitreAnim = spring({
+    frame: frame - 60,
     fps,
     config: { damping: 200, stiffness: 60, mass: 2 },
   });
 
-  // Animation de l'instructeur
-  const instructeurAnimation = spring({
-    frame: frame - 90, // Commence après 3 secondes
+  const instructeurAnim = spring({
+    frame: frame - 90,
     fps,
     config: { damping: 200, stiffness: 60, mass: 2 },
   });
@@ -63,7 +47,6 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
         background: `linear-gradient(135deg, ${couleurSecondaire} 0%, ${couleurPrincipale}22 50%, ${couleurSecondaire} 100%)`,
       }}
     >
-      {/* Titre principal */}
       <h1
         style={{
           color: "#FFFFFF",
@@ -71,8 +54,8 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
           fontFamily: "Inter, sans-serif",
           fontWeight: 200,
           letterSpacing: 3,
-          opacity: titreAnimation,
-          transform: `translateY(${interpolate(titreAnimation, [0, 1], [30, 0])}px)`,
+          opacity: titreAnim,
+          transform: `translateY(${interpolate(titreAnim, [0, 1], [30, 0])}px)`,
           textAlign: "center",
           margin: 0,
         }}
@@ -80,18 +63,16 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
         {titre}
       </h1>
 
-      {/* Ligne décorative */}
       <div
         style={{
-          width: interpolate(titreAnimation, [0, 1], [0, 120]),
+          width: interpolate(titreAnim, [0, 1], [0, 120]),
           height: 1,
           background: couleurPrincipale,
           margin: "30px 0",
-          opacity: titreAnimation,
+          opacity: titreAnim,
         }}
       />
 
-      {/* Sous-titre */}
       {sousTitre && (
         <p
           style={{
@@ -99,8 +80,8 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
             fontSize: 28,
             fontFamily: "Inter, sans-serif",
             fontWeight: 300,
-            opacity: sousTitreAnimation,
-            transform: `translateY(${interpolate(sousTitreAnimation, [0, 1], [20, 0])}px)`,
+            opacity: sousTitreAnim,
+            transform: `translateY(${interpolate(sousTitreAnim, [0, 1], [20, 0])}px)`,
             margin: 0,
           }}
         >
@@ -108,7 +89,6 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
         </p>
       )}
 
-      {/* Nom de l'instructeur */}
       {instructeur && (
         <p
           style={{
@@ -116,7 +96,7 @@ export const IntroScene: React.FC<IntroSceneProps> = ({
             fontSize: 20,
             fontFamily: "Inter, sans-serif",
             fontWeight: 300,
-            opacity: instructeurAnimation,
+            opacity: instructeurAnim,
             marginTop: 40,
             letterSpacing: 2,
             textTransform: "uppercase",
