@@ -7,11 +7,11 @@ import {
   interpolate,
 } from "remotion";
 import { MeditationInputProps } from "../types";
-import { IntroScene } from "../components/IntroScene";
-import { BreathingCircle } from "../components/BreathingCircle";
-import { TextSegment } from "../components/TextSegment";
-import { OutroScene } from "../components/OutroScene";
-import { TransitionWave } from "../components/TransitionWave";
+import { IntroScene } from "./IntroScene";
+import { BreathingCircle } from "./BreathingCircle";
+import { TextSegment } from "./TextSegment";
+import { OutroScene } from "./OutroScene";
+import { TransitionWave } from "./TransitionWave";
 
 export const defaultMeditationProps: MeditationInputProps = {
   titre: "Méditation du Matin",
@@ -83,7 +83,6 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
 
   const frame = useCurrentFrame();
 
-  const FPS = 30;
   const DUREE_TOTALE = 18000;
   const INTRO_DUREE = 600;
   const OUTRO_DEBUT = DUREE_TOTALE - 600;
@@ -106,7 +105,6 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         overflow: "hidden",
       }}
     >
-      {/* Particules d'ambiance */}
       {particules.map((p, i) => (
         <div
           key={i}
@@ -125,7 +123,6 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         />
       ))}
 
-      {/* Musique de fond */}
       {musiqueUrl && musiqueUrl.length > 0 && (
         <Audio
           src={musiqueUrl}
@@ -143,7 +140,6 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         />
       )}
 
-      {/* Introduction */}
       <Sequence from={0} durationInFrames={INTRO_DUREE}>
         <IntroScene
           titre={titre}
@@ -154,12 +150,10 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         />
       </Sequence>
 
-      {/* Transition intro → contenu */}
       <Sequence from={INTRO_DUREE - 30} durationInFrames={60}>
         <TransitionWave couleur={`${couleurPrincipale}33`} dureeFrames={60} />
       </Sequence>
 
-      {/* Cercle de respiration */}
       <Sequence from={INTRO_DUREE} durationInFrames={OUTRO_DEBUT - INTRO_DUREE}>
         <AbsoluteFill
           style={{
@@ -176,7 +170,6 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         </AbsoluteFill>
       </Sequence>
 
-      {/* Segments de texte guidé */}
       {segments.map((segment, index) => (
         <TextSegment
           key={index}
@@ -187,12 +180,10 @@ export const MeditationVideo: React.FC<MeditationInputProps> = (props) => {
         />
       ))}
 
-      {/* Transition contenu → outro */}
       <Sequence from={OUTRO_DEBUT - 30} durationInFrames={60}>
         <TransitionWave couleur={`${couleurPrincipale}33`} dureeFrames={60} />
       </Sequence>
 
-      {/* Conclusion */}
       <Sequence from={OUTRO_DEBUT} durationInFrames={DUREE_TOTALE - OUTRO_DEBUT}>
         <OutroScene
           couleurPrincipale={couleurPrincipale}
