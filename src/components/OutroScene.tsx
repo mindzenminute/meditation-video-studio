@@ -1,25 +1,14 @@
-// src/components/OutroScene.tsx
-// ============================================================
-// Écran de fin — remerciement et retour au calme
-// ============================================================
-
 import React from "react";
 import { useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
 
-interface OutroSceneProps {
+export const OutroScene: React.FC<{
   couleurPrincipale?: string;
   couleurSecondaire?: string;
   instructeur?: string;
-  afficherSkillsBadge?: boolean;
-  skillsProfileUrl?: string;
-}
-
-export const OutroScene: React.FC<OutroSceneProps> = ({
+}> = ({
   couleurPrincipale = "#6B5CE7",
   couleurSecondaire = "#1a1a2e",
   instructeur,
-  afficherSkillsBadge = false,
-  skillsProfileUrl,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -42,14 +31,7 @@ export const OutroScene: React.FC<OutroSceneProps> = ({
         background: `linear-gradient(135deg, ${couleurSecondaire}, ${couleurPrincipale}15)`,
       }}
     >
-      {/* Symbole Namaste / Lotus */}
-      <div
-        style={{
-          fontSize: 72,
-          opacity: apparition,
-          marginBottom: 30,
-        }}
-      >
+      <div style={{ fontSize: 72, opacity: apparition, marginBottom: 30 }}>
         🪷
       </div>
 
@@ -76,28 +58,8 @@ export const OutroScene: React.FC<OutroSceneProps> = ({
           marginTop: 20,
         }}
       >
-        Merci d'avoir pris ce moment pour vous
+        Merci d&apos;avoir pris ce moment pour vous
       </p>
-
-      {/* Badge skills.sh si activé */}
-      {afficherSkillsBadge && skillsProfileUrl && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 60,
-            opacity: interpolate(apparition, [0, 0.7, 1], [0, 0, 0.7]),
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <img
-            src={`https://skills.sh/api/badge?url=${encodeURIComponent(skillsProfileUrl)}`}
-            alt="Skills Badge"
-            style={{ height: 40 }}
-          />
-        </div>
-      )}
     </div>
   );
 };
