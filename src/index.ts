@@ -1,7 +1,14 @@
 // src/index.ts
 // ============================================================
-// Ce fichier exporte simplement le Root
-// C'est le point d'entrée que Remotion cherche
+// Point d'entrée de Remotion
+// 
+// registerRoot() dit à Remotion : "voici le composant principal
+// qui contient toutes mes compositions vidéo"
+//
+// C'est LA ligne indispensable sans laquelle rien ne fonctionne
 // ============================================================
 
-export { RemotionRoot } from "./Root";
+import { registerRoot } from "remotion";
+import { RemotionRoot } from "./Root";
+
+registerRoot(RemotionRoot);
