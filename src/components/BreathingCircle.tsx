@@ -3,7 +3,7 @@ import { Composition } from "remotion";
 import {
   MeditationVideo,
   defaultMeditationProps,
-} from "./compositions/MeditationVideo";
+} from "./components/MeditationVideo";
 
 export const RemotionRoot: React.FC = () => {
   return (
