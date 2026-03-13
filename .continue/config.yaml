@@ -231,10 +231,7 @@ slashCommands:
       Convertis les durées en frames pour Remotion à 30fps.
       Format de réponse : `// 30s = 900 frames` ou `const X = 30 * 30; // 900 frames`
 # Variables d'environnement recommandées
-env:
-  OPENROUTER_API_KEY: "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"  # À définir dans tes variables d'environnement
-  REMOTION_APP_TITLE: "MindZenMinute"
-  REMOTION_DEFAULT_FPS: "30"
+
 
 
 
