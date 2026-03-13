@@ -1,0 +1,241 @@
+# .continue/config.yaml
+name: Meditation Video Studio Config
+version: 0.0.1
+schema: v1
+
+# ============================================================================
+# 🤖 MODÈLES OPENROUTER
+# ============================================================================
+
+models:
+  # ── Modèle principal : Chat & Édition de code ──
+  - name: openrouter-main
+    provider: openrouter
+    model: stepfun/step-3.5-flash:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: ${OPENROUTER_API_KEY} # ✅ Utilise une variable d'environnement
+    roles: ["chat", "edit", "apply"]
+    
+    # Paramètres optimisés pour du code Remotion/React
+    requestOptions:
+      temperature: 0.15      # Bas pour du code précis
+      topP: 0.9
+      maxTokens: 4096
+      presencePenalty: 0.0
+      frequencyPenalty: 0.0
+    
+    # Contexte spécifique au modèle principal
+    context:
+      - provider: codebase
+        include:
+          - "src/**/*"
+          - "remotion.config.ts"
+          - "package.json"
+        exclude:
+          - "node_modules/**"
+          - "build/**"
+          - "*.mp4"
+          - "*.mov"
+
+  # ── Modèle autocomplete : Complétion rapide ──
+  - name: qwen3-coder-free
+    provider: openrouter
+    model: qwen/qwen3-coder:free
+    apiBase: https://openrouter.ai/api/v1
+    apiKey:  ${OPENROUTER_API_KEY} # ✅ Même clé via env var
+    roles: ["autocomplete"]
+    
+    requestOptions:
+      temperature: 0.1       # Très bas pour l'autocomplete
+      maxTokens: 256         # Court et rapide
+      topP: 0.85
+
+# ── Modèle d'autocomplétion par défaut (TAB) ──
+tabAutocompleteModel:
+  name: qwen3-coder-free
+  params:
+    maxSuffixPercentage: 20  # Limite le contexte après le curseur
+    debounceDelay: 150       # Évite les appels trop fréquents
+    maxPromptTokens: 1024    # Optimise la vitesse
+
+# ============================================================================
+# 📚 DOCUMENTATIONS DE RÉFÉRENCE
+# ============================================================================
+
+docs:
+  - name: Remotion Official Docs
+    url: https://www.remotion.dev/docs
+    faviconUrl: https://www.remotion.dev/favicon.ico
+    
+  - name: Remotion Skills (Sh)
+    url: https://github.com/remotion-dev/skills
+    faviconUrl: https://skills.sh/favicon.ico
+    
+  - name: Vercel Deployment Guide
+    url: https://vercel.com/docs
+    faviconUrl: https://vercel.com/favicon.ico
+    
+  - name: Vercel Skills
+    url: https://github.com/vercel-labs/agent-skills
+    faviconUrl: https://vercel.com/favicon.ico  
+    
+    
+  - name: React 18 Docs
+    url: https://react.dev/reference/react
+    faviconUrl: https://react.dev/favicon.ico
+
+# ============================================================================
+# 🎯 RÈGLES SPÉCIFIQUES AU PROJET
+# ============================================================================
+
+rules:
+  # ── Règle globale pour tous les fichiers ──
+  - name: Remotion Project Rules
+    pattern: "**/*"
+    rule: |
+      Tu es un expert Remotion v4+, React 18 et TypeScript strict.
+      
+      ## 🎬 Format Vidéo
+      - Toujours travailler en 1920×1080, 30fps, 16:9
+      - Durée totale = 18000 frames pour 10 minutes
+      - Calculer les frames : `frames = secondes × 30`
+      
+      ## 🎨 Style Zen Minimaliste
+      - Fonds : navy (#0a1628), indigo (#1a1a3a), noir doux (#0d0d15)
+      - Typographie : Inter/system-ui, sans-serif, min 24px
+      - Animations : lentes (≥60 frames), easing `easeInOut`, pas de transitions brusques
+      - Couleurs : monochrome + accents dorés doux (#c9a961) uniquement si nécessaire
+      
+      ## ⚙️ APIs Remotion Obligatoires
+      - Utiliser : `useCurrentFrame`, `interpolate`, `spring`, `useVideoConfig`, `AbsoluteFill`, `Sequence`, `Series`
+      - `inputProps` : toujours typé et JSON-serializable (jamais de fonctions)
+      - `spring` config zen : `{ damping: 20, stiffness: 100, mass: 1 }`
+      - `interpolate` : toujours avec `extrapolateLeft: "clamp", extrapolateRight: "clamp"`
+      
+      ## 🏗️ Architecture
+      - Composants : `React.memo`, props typées avec `type` (pas `interface`)
+      - Exporter les interfaces de props en haut de chaque fichier
+      - Chaque composant doit être prévisualisable seul dans Remotion Studio
+      
+      ## 🚀 Qualité Code
+      - TypeScript strict : pas de `any`, validation des props
+      - Commentaires : expliquer frames, timing, easing pour personnalisation future
+      - Performance : `useMemo` pour interpolations complexes, éviter les recalculs
+
+  # ── Règle spécifique aux composants Remotion ──
+  - name: Remotion Components
+    pattern: "src/components/**/*.tsx"
+    rule: |
+      Tu génères un composant Remotion réutilisable.
+      
+      Checklist obligatoire :
+      [ ] Props entièrement typées avec `type` et JSDoc
+      [ ] Export du type des props en haut du fichier
+      [ ] `React.memo` pour optimisation
+      [ ] Utilisation de `useCurrentFrame()` et `useVideoConfig()`
+      [ ] Animations via `interpolate()` ou `spring()` avec config zen
+      [ ] `AbsoluteFill` comme conteneur racine
+      [ ] Styles inline avec valeurs calculées (pas de CSS externe)
+      [ ] Fallback visuel si props optionnelles manquantes
+      [ ] `displayName` défini pour le debugging
+
+  # ── Règle pour les compositions principales ──
+  - name: Remotion Compositions
+    pattern: "src/compositions/**/*.tsx"
+    rule: |
+      Tu génères une composition Remotion principale.
+      
+      Checklist obligatoire :
+      [ ] Exporter l'interface `InputProps` en haut, JSON-serializable
+      [ ] Utiliser `<Series>` ou `<Sequence>` pour orchestrer le timing
+      [ ] Calculer les frames via constantes : `const FPS = 30; const INTRO = 30 * FPS;`
+      [ ] Documenter chaque `Sequence` avec commentaire : `// [0–30s] Intro`
+      [ ] Props passées aux enfants : spread typé `{...props}`
+      [ ] Exporter le composant avec `displayName`
+
+  # ── Règle pour Root.tsx ──
+  - name: Remotion Root Registration
+    pattern: "src/Root.tsx"
+    rule: |
+      Tu configures l'enregistrement de composition Remotion.
+      
+      Checklist obligatoire :
+      [ ] Importer `registerRoot` et `Composition` de 'remotion'
+      [ ] Définir constantes : FPS, WIDTH, HEIGHT, DURATION_IN_SECONDS
+      [ ] Créer `defaultProps` avec exemple réaliste et complet
+      [ ] Enregistrer avec `registerRoot(Root)` en bas du fichier
+      [ ] Props d'exemple : couvrir tous les cas d'usage pour prévisualisation
+
+# ============================================================================
+# 🧭 CONTEXTES ET INDEXATION
+# ============================================================================
+
+context:
+  # ── Codebase locale ──
+  - provider: codebase
+    include:
+      - "src/**/*"
+      - "remotion.config.ts"
+      - "package.json"
+      - "tsconfig.json"
+    exclude:
+      - "node_modules/**"
+      - "build/**"
+      - "dist/**"
+      - "*.mp4"
+      - "*.mov"
+      - "*.log"
+
+  # ── Fichiers de règles ──
+  - provider: file
+    path: ".continuerules"
+    description: "Règles projet Remotion méditation"
+
+  # ── Documentation Remotion via skills.sh ──
+  - provider: docs
+    name: "Remotion Skills"
+    url: "https://skills.sh/remotion"
+    
+  - provider: docs
+    name: "Remotion Official"
+    url: "https://www.remotion.dev/docs"
+
+# ============================================================================
+# ⚡ PARAMÈTRES GLOBAUX
+# ============================================================================
+
+# Complétion automatique
+tabAutocomplete:
+  enabled: true
+  disableInFiles:
+    - "*.md"
+    - "*.json"
+    - "*.yaml"
+  useCopyBuffer: false  # Évite les fuites de contexte
+
+# Slash commands personnalisés
+slashCommands:
+  - name: "meditation"
+    description: "Génère un segment de méditation avec timing Remotion"
+    prompt: |
+      Génère un objet MeditationSegment pour Remotion avec :
+      - text: le texte de guidance
+      - startTime: en secondes depuis le début de la phase guidance
+      - duration: en secondes
+      - align: 'center' par défaut
+      Retourne uniquement le code TypeScript, pas d'explications.
+
+  - name: "timing"
+    description: "Convertit secondes ↔ frames pour Remotion 30fps"
+    prompt: |
+      Convertis les durées en frames pour Remotion à 30fps.
+      Format de réponse : `// 30s = 900 frames` ou `const X = 30 * 30; // 900 frames`
+# Variables d'environnement recommandées
+env:
+  OPENROUTER_API_KEY: "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"  # À définir dans tes variables d'environnement
+  REMOTION_APP_TITLE: "MindZenMinute"
+  REMOTION_DEFAULT_FPS: "30"
+
+
+
+
