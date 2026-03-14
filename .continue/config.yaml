@@ -230,9 +230,18 @@ slashCommands:
     prompt: |
       Convertis les durées en frames pour Remotion à 30fps.
       Format de réponse : `// 30s = 900 frames` ou `const X = 30 * 30; // 900 frames`
+# ============================================================================
+# ⚡ PARAMÈTRES GLOBAUX (suite)
+# ============================================================================
+
 # Variables d'environnement recommandées
+env:
+  REMOTION_APP_TITLE: "MindZen Minute"
+  REMOTION_DEFAULT_FPS: "30"
+  OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"  # ← Toujours via variable
 
-
-
-
+# Complétion automatique (déjà défini plus haut, vérifie qu'il n'y a pas de doublon)
+# tabAutocomplete:
+#   enabled: true
+#   ...
 
