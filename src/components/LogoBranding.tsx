@@ -6,6 +6,7 @@ export type LogoBrandingProps = {
   subtitle?: string;
   startFrame?: number;
   entranceDuration?: number;
+  finalOpacity?: number;  // ← AJOUTÉ
 };
 
 export const LogoBranding: React.FC<LogoBrandingProps> = memo(({
@@ -13,6 +14,7 @@ export const LogoBranding: React.FC<LogoBrandingProps> = memo(({
   subtitle,
   startFrame = 0,
   entranceDuration = 90,
+  finalOpacity = 1,  // ← AJOUTÉ
 }) => {
   const frame = useCurrentFrame();
   
@@ -24,7 +26,7 @@ export const LogoBranding: React.FC<LogoBrandingProps> = memo(({
   );
   
   const eased = progress * progress * (3 - 2 * progress);
-  const opacity = eased;
+  const opacity = eased * finalOpacity;  // ← UTILISÉ
   const scale = interpolate(eased, [0, 1], [0.95, 1]);
   const translateY = interpolate(eased, [0, 1], [20, 0]);
 
