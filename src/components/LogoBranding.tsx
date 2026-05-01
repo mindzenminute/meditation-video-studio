@@ -1,103 +1,81 @@
-import React, { memo } from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import React from 'react';
+import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 
-export type LogoBrandingProps = {
-  title: string;
-  subtitle?: string;
-  startFrame?: number;
-  entranceDuration?: number;
+export const LogoBranding: React.FC<{
+  startFrame: number;
   finalOpacity?: number;
-  /** MODIF: mode 'intro' = apparition normale, 'background' = discret en fond */
-  mode?: 'intro' | 'background';
-};
-
-export const LogoBranding: React.FC<LogoBrandingProps> = memo(({
-  title,
-  subtitle,
-  startFrame = 0,
-  entranceDuration = 45, // MODIF: 90 → 45 = 1.5s. Plus rapide pour intro 8s
-  finalOpacity = 1,
-  mode = 'intro', // MODIF: nouveau prop
-}) => {
+  title?: string;
+  subtitle?: string;
+}> = ({ startFrame, finalOpacity = 1, title, subtitle }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const relativeFrame = frame - startFrame;
   
-  const progress = interpolate(
-    frame - startFrame,
-    [0, entranceDuration],
-    [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-  );
+  // Animation d’apparition : scale + blur
+  const scale = spring({
+    frame: relativeFrame,
+    fps,
+    config: { damping: 200, stiffness: 100 },
+    from: 0.8,
+    to: 1,
+  });
   
-  const eased = progress * progress * (3 - 2 * progress);
+  const blur = interpolate(relativeFrame, [0, 60], [8, 0], {
+    extrapolateRight: 'clamp',
+  });
   
-  // MODIF: Si mode background, on reste à opacity basse tout le temps
-  const opacity = mode === 'background' 
-    ? 0.1 // 10% fixe pour le fond
-    : eased * finalOpacity;
+  const opacity = interpolate(relativeFrame, [0, 45], [0, finalOpacity], {
+    extrapolateRight: 'clamp',
+  });
   
-  const scale = mode === 'background' 
-    ? 1 // Pas d’anim de scale en fond
-    : interpolate(eased, [0, 1], [0.95, 1]);
+  // Légère pulsation = respiration, 1 cycle sur 6s
+  const breathe = 1 + Math.sin(relativeFrame / fps * Math.PI / 3) * 0.02;
   
-  const translateY = mode === 'background'
-    ? 0 // Pas de mouvement en fond
-    : interpolate(eased, [0, 1], [20, 0]);
-
   return (
-    <AbsoluteFill
-      style={{
-        // MODIF: Fond transparent si mode background, sinon bleu foncé
-        backgroundColor: mode === 'background' ? 'transparent' : '#0a1628',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        opacity,
-        transform: `scale(${scale}) translateY(${translateY}px)`,
-        // MODIF: pointerEvents none pour laisser cliquer à travers en background
-        pointerEvents: mode === 'background' ? 'none' : 'auto',
-      }}
-    >
-      <h1
-        style={{
-          fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: mode === 'background' ? 32 : 48, // MODIF: plus petit en fond
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center',
+      justifyContent: 'center',
+      opacity,
+      transform: `scale(${scale * breathe})`,
+      filter: `blur(${blur}px)`,
+    }}>
+      <Img 
+        src={staticFile('logo-sablier.png')} // Mets ton image ici
+        style={{ 
+          width: 280, 
+          height: 'auto',
+          filter: 'drop-shadow(0 0 30px rgba(100, 180, 255, 0.3))',
+        }} 
+      />
+      {title && (
+        <h1 style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: 42,
           fontWeight: 300,
-          color: '#ffffff',
-          margin: 0,
-          letterSpacing: '0.05em',
-          textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        {title}
-      </h1>
+          color: '#fff',
+          marginTop: 30,
+          letterSpacing: '0.1em',
+          textShadow: '0 2px 20px rgba(0,0,0,0.6)',
+          opacity: interpolate(relativeFrame, [60, 120], [0, 1]),
+        }}>
+          {title}
+        </h1>
+      )}
       {subtitle && (
-        <p
-          style={{
-            fontFamily: 'Inter, system-ui, sans-serif',
-            fontSize: mode === 'background' ? 14 : 20, // MODIF: plus petit en fond
-            fontWeight: 300,
-            color: '#a0a0c0',
-            margin: '12px 0 0 0',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <p style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: 20,
+          fontWeight: 200,
+          color: '#c9a961',
+          marginTop: 10,
+          letterSpacing: '0.2em',
+          opacity: interpolate(relativeFrame, [120, 180], [0, 1]),
+        }}>
           {subtitle}
         </p>
       )}
-      <div
-        style={{
-          width: mode === 'background' ? 80 : 120, // MODIF: barre plus courte en fond
-          height: 2,
-          background: 'linear-gradient(90deg, transparent, #c9a961, transparent)',
-          marginTop: mode === 'background' ? 16 : 24,
-          opacity: mode === 'background' ? 0.3 : 0.6,
-        }}
-      />
-    </AbsoluteFill>
+    </div>
   );
-});
-
-LogoBranding.displayName = 'LogoBranding';
-export default LogoBranding;
+};
