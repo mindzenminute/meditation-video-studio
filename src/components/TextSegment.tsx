@@ -1,30 +1,21 @@
 import React, { memo } from 'react';
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
 
-// ============================================================================
-// 📦 TYPES — Exportés pour utilisation dans MeditationVideo.tsx
-// ============================================================================
-
-/**
- * Segment de texte de guidance avec timing précis
- * Utilisé dans MeditationVideoInputProps.guidanceSegments
- */
 export type MeditationSegment = {
-  /** Texte à afficher */
   text: string;
-  /** Temps de début en secondes (relatif au début de la phase guidance) */
   startTime: number;
-  /** Durée d'affichage en secondes */
   duration: number;
-  /** Alignement optionnel (défaut: 'center') */
   align?: 'left' | 'center' | 'right';
 };
 
 export type TextSegmentProps = {
   text: string;
   startFrame: number;
+  /** MODIF: 30 frames = 1s de fade in */
   fadeInDuration?: number;
+  /** MODIF: 510 frames = 17s de lecture fixe */
   displayDuration?: number;
+  /** MODIF: 30 frames = 1s de fade out */
   fadeOutDuration?: number;
   align?: 'left' | 'center' | 'right';
   marginLeft?: number;
@@ -33,13 +24,15 @@ export type TextSegmentProps = {
 
 /**
  * TextSegment — Affichage progressif du texte de guidance
+ * MODIF: Durée totale par défaut = 30 + 510 + 30 = 570 frames = 19s
+ * Avec 1s de TransitionWave avant = 20s par segment
  */
 export const TextSegment: React.FC<TextSegmentProps> = memo(({
   text,
   startFrame,
-  fadeInDuration = 60,
-  displayDuration = 180,
-  fadeOutDuration = 60,
+  fadeInDuration = 30, // MODIF: 60 → 30 = 1s
+  displayDuration = 510, // MODIF: 180 → 510 = 17s
+  fadeOutDuration = 30, // MODIF: 60 → 30 = 1s
   align = 'center',
   marginLeft = 120,
   marginRight = 120,
@@ -56,7 +49,7 @@ export const TextSegment: React.FC<TextSegmentProps> = memo(({
   if (relativeFrame < fadeInDuration) {
     opacity = interpolate(relativeFrame, [0, fadeInDuration], [0, 1], {
       extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-      easing: (t) => t * t * (3 - 2 * t),
+      easing: (t) => t * t * (3 - 2 * t), // MODIF: Garde le easing doux
     });
   } else if (relativeFrame < fadeInDuration + displayDuration) {
     opacity = 1;
@@ -71,7 +64,8 @@ export const TextSegment: React.FC<TextSegmentProps> = memo(({
   const paddingLeft = align === 'left' ? marginLeft : align === 'center' ? 0 : 'auto';
   const paddingRight = align === 'right' ? marginRight : align === 'center' ? 0 : 'auto';
   
-  const parallaxOffset = interpolate(relativeFrame, [0, totalDuration], [0, 5], {
+  // MODIF: Parallax réduit à 3px max. Optionnel : commente ces 3 lignes si tu veux 0 mouvement
+  const parallaxOffset = interpolate(relativeFrame, [0, totalDuration], [0, 3], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
 
@@ -90,7 +84,7 @@ export const TextSegment: React.FC<TextSegmentProps> = memo(({
       <p
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          fontSize: 36,
+          fontSize: 36, // MODIF: Tu peux passer à 32 si tu trouves ça gros
           fontWeight: 300,
           lineHeight: 1.6,
           color: '#f0f0ff',
@@ -98,7 +92,8 @@ export const TextSegment: React.FC<TextSegmentProps> = memo(({
           margin: 0,
           maxWidth: width - marginLeft - marginRight - 40,
           textShadow: '0 2px 15px rgba(0, 0, 0, 0.5)',
-          filter: `blur(${interpolate(opacity, [0, 0.5, 1], [2, 0.5, 0], { extrapolateLeft: 'clamp' })}px)`,
+          // MODIF: Blur plus subtil pour le zen
+          filter: `blur(${interpolate(opacity, [0, 0.3, 1], [1, 0, 0], { extrapolateLeft: 'clamp' })}px)`,
         }}
       >
         {text}
