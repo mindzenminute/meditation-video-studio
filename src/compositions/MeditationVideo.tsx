@@ -92,7 +92,7 @@ export const MeditationVideo: React.FC = () => {
       <Sequence from={0} durationInFrames={TOTAL_DURATION}>
         <LogoBranding 
           startFrame={0} 
-          finalOpacity={0.1} 
+          finalOpacity={0.07} 
           title={BRANDING_CONFIG.title}
           subtitle=""
           circleColor={BRANDING_CONFIG.circleColor}
@@ -107,6 +107,11 @@ export const MeditationVideo: React.FC = () => {
           backgroundVideoSrc="intro-bg-8s.mp4"
           transitionStartFrame={210} // Fade à 7s sur 8s
         />
+      </Sequence>
+      
+      {/* Crossfade sécurité entre intro et breathing */}
+      <Sequence from={INTRO_DURATION - 2} durationInFrames={2}>
+        <AbsoluteFill style={{ backgroundColor: '#0a1628', opacity: 0.3 }} />
       </Sequence>
       
       {/* 2. RESPIRATION : 8s → 26s / frames 240 → 779 */}
