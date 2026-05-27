@@ -1,3 +1,17 @@
+// src/Root.tsx - NE SUPPRIME RIEN, AJUSTE JUSTE L'ENTRÉE
+import {MeditationScript} from './types/MeditationScript';
+import {YourExistingVideoComponent} from './YourExistingVideo'; // Ton code actuel !
+
+export const RemotionRoot = () => {
+  // Les props viennent maintenant d'un JSON standardisé
+  const script = useInputProps<MeditationScript>(); 
+  
+  // Tu passes les données à TON composant existant
+  // Si ton composant attendait des props différentes, 
+  // fais la conversion ICI uniquement
+  return <YourExistingVideoComponent data={script} />;
+};
+
 import { Composition } from 'remotion';
 import { MeditationVideo, MeditationVideoInputProps } from './compositions/MeditationVideo';
 import { TestLogoBranding } from './test-LogoBranding';
